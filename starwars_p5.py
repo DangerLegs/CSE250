@@ -83,8 +83,31 @@ dat['seen_any'] = dat['seen_any'].map(seen_map)
 
 
 # %%
+# Adding a column that shows income range as a number
+(dat.household_income
+    .str.split(' - ', expand=True)
+    .rename(columns={0: "min_income", 1: 'max_income'})
+    .min_income.str.replace('\$|,|\+', '', regex = True)
+    .astype('float')
+)
+
+
+# %% 
+# Adding a column that shows age range as a number
+
+(dat.age
+    .str.split('-', expand = True)
+    .rename(columns = {0: 'min_age', 1: "max_age"})
+    .min_age
+    .str.replace('> ', '')
+    .astype('float')
+)
+
+# %%
+#Adding a column that shows school groupings as a number
+# %%
 
 seenDF = dat.filter(regex = 'seen__')
-
 DatSeen = pd.get_dummies(seenDF)
-# %%
+SeenMovies = DatSeen.sum()
+
