@@ -81,6 +81,67 @@ dat.columns = dat_names.column_names.to_list()
 seen_map = {'Yes': 1, 'No': 0}
 dat['seen_any'] = dat['seen_any'].map(seen_map)
 
+# %% 
+dat = dat[dat.seen_any == 1]
+
+# %%
+
+audrey = dat.filter(items=['seen__i__the_phantom_menace', 'seen__ii__attack_of_the_clones',
+       'seen__iii__revenge_of_the_sith', 'seen__iv__a_new_hope',
+       'seen__v_the_empire_strikes_back', 'seen__vi_return_of_the_jedi'])
+
+# %%
+audrey.count()
+
+# %%
+audrey.agg({'seen__i__the_phantom_menace': ['count'], 'seen__ii__attack_of_the_clones': ['count'],
+       'seen__iii__revenge_of_the_sith': ['count'], 'seen__iv__a_new_hope': ['count'],
+       'seen__v_the_empire_strikes_back': ['count'], 'seen__vi_return_of_the_jedi': ['count']})
+# %%
+
+seen_the_movies = {'Movies' : ['seen__i__the_phantom_menace', 'seen__ii__attack_of_the_clones',
+       'seen__iii__revenge_of_the_sith', 'seen__iv__a_new_hope',
+       'seen__v_the_empire_strikes_back', 'seen__vi_return_of_the_jedi'],
+                'Seen' : [673,571,550,607,758,738]}
+
+# %%
+
+used = pd.DataFrame(seen_the_movies, columns = ['Movies', 'Seen'])
+
+# %%
+sum(used.Seen)
+
+# %%
+used = used.assign(Percentage = lambda x : x.Seen / 936 * 100)
+
+# %% 
+# Charting percentage of movies seen
+seen_movies = alt.Chart(used).mark_bar().encode(
+    alt.X('Percentage', title = 'Percentage Seen'),
+    alt.Y('Movies', title = 'Movie title'),
+    alt.Text('Percentage:Q', format = '.0%')
+).properties(title = 'Pecentage of Each Movie Seen')
+
+
+
+
+# %% 
+shot_first = dat.shot_first.reset_index()
+shot_first = (shot_first.groupby('shot_first').agg({'shot_first':'count'}))
+
+
+sho = {'Who' : ['Greedo', 'Han', "I don't understand this questio"], 'num' :  [197, 325, 306]}
+
+# %%
+shot = pd.DataFrame(sho, columns = ['Who', 'num'])
+
+
+# %%
+who_shot = alt.Chart(shot).mark_bar().encode(
+    alt.X()
+)
+
+
 
 # %%
 # Adding a column that shows income range as a number
@@ -111,3 +172,9 @@ seenDF = dat.filter(regex = 'seen__')
 DatSeen = pd.get_dummies(seenDF)
 SeenMovies = DatSeen.sum()
 
+
+# dat3 = pd.get_dummies(data=dat2, columns=['seen_any', 'star_wars_fans',
+#        'seen__i__the_phantom_menace', 'seen__ii__attack_of_the_clones',
+#        'seen__iii__revenge_of_the_sith', 'seen__iv__a_new_hope',
+#        'seen__v_the_empire_strikes_back', 'seen__vi_return_of_the_jedi', 'know_expanded', 'expanded_fan',
+#        'star_trek_fan'])
