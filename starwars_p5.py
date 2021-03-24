@@ -138,8 +138,9 @@ shot = pd.DataFrame(sho, columns = ['Who', 'num'])
 
 # %%
 who_shot = alt.Chart(shot).mark_bar().encode(
-    alt.X()
-)
+    alt.X('num', title = 'Number of votes'),
+    alt.Y('Who', title = 'Who shot first?')
+).properties(title = 'Who shot first?')
 
 
 
@@ -173,8 +174,38 @@ DatSeen = pd.get_dummies(seenDF)
 SeenMovies = DatSeen.sum()
 
 
-# dat3 = pd.get_dummies(data=dat2, columns=['seen_any', 'star_wars_fans',
+ # %%
+# dat3 = pd.get_dummies(data=dat, columns=['seen_any', 'star_wars_fans',
 #        'seen__i__the_phantom_menace', 'seen__ii__attack_of_the_clones',
 #        'seen__iii__revenge_of_the_sith', 'seen__iv__a_new_hope',
 #        'seen__v_the_empire_strikes_back', 'seen__vi_return_of_the_jedi', 'know_expanded', 'expanded_fan',
 #        'star_trek_fan'])
+
+# %%
+dat_view = dat.filter(regex = 'view__')
+(dat_view
+    .fillna(value = "Missing")
+    .apply(lambda x: pd.factorize(x)[0]))
+pd.get_dummies(dat_view)
+# %%
+pd.get_dummies(dat_seen)
+dat_seen.fillna(value = "NO")
+print(pd.factorize(dat.view__han_solo)[0])
+# %%
+variables_replace = {
+    'Neither favorably nor unfavorably (neutral)':0,
+    'Very favorably':3,
+    'Somewhat favorably': 2
+}
+dat_view.replace(variables_replace)
+
+
+view_replace = {
+    'Very favorably' : 2,
+    'Somewhat favorably' : 1,
+    'Neither favorably nor unfavorably (neutral)' : 0,
+    'Somewhat unfavorably' : -1,
+    'Very unfavorably' : -2,
+    'Unfamiliar (N/A)' : np.nan,
+    np.nan : np.nan
+}
