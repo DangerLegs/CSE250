@@ -187,25 +187,47 @@ dat_view = dat.filter(regex = 'view__')
     .fillna(value = "Missing")
     .apply(lambda x: pd.factorize(x)[0]))
 pd.get_dummies(dat_view)
+
 # %%
-pd.get_dummies(dat_seen)
-dat_seen.fillna(value = "NO")
-print(pd.factorize(dat.view__han_solo)[0])
+
+# one hot encode all of the columns
+
+contains1 = dat.columns[dat.columns.str.contains('seen__|view__|age|gender|shot_first|education|location', regex = True)]
+
+dat = dat.join(pd.get_dummies(dat[contains1]))
+
 # %%
-variables_replace = {
-    'Neither favorably nor unfavorably (neutral)':0,
-    'Very favorably':3,
-    'Somewhat favorably': 2
-}
-dat_view.replace(variables_replace)
+dat = dat.drop(columns = ['seen__i__the_phantom_menace', 'seen__ii__attack_of_the_clones',
+       'seen__iii__revenge_of_the_sith', 'seen__iv__a_new_hope',
+       'seen__v_the_empire_strikes_back', 'seen__vi_return_of_the_jedi','view__han_solo', 'view__luke_skywalker', 'view__princess_leia_organa',
+       'view__anakin_skywalker', 'view__obi_wan_kenobi',
+       'view__emperor_palpatine', 'view__darth_vader',
+       'view__lando_calrissian', 'view__boba_fett', 'view__c-3p0',
+       'view__r2_d2', 'view__jar_jar_binks', 'view__padme_amidala',
+       'view__yoda', 'shot_first', 'know_expanded', 'expanded_fan',
+       'gender', 'age', 'education','location_(census_region)'])
 
 
-view_replace = {
-    'Very favorably' : 2,
-    'Somewhat favorably' : 1,
-    'Neither favorably nor unfavorably (neutral)' : 0,
-    'Somewhat unfavorably' : -1,
-    'Very unfavorably' : -2,
-    'Unfamiliar (N/A)' : np.nan,
-    np.nan : np.nan
-}
+# %%
+
+# pd.get_dummies(dat_seen)
+# dat_seen.fillna(value = "NO")
+# print(pd.factorize(dat.view__han_solo)[0])
+# # %%
+# variables_replace = {
+#     'Neither favorably nor unfavorably (neutral)':0,
+#     'Very favorably':3,
+#     'Somewhat favorably': 2
+# }
+# dat_view.replace(variables_replace)
+
+
+# view_replace = {
+#     'Very favorably' : 4,
+#     'Somewhat favorably' : 3,
+#     'Neither favorably nor unfavorably (neutral)' : 2,
+#     'Somewhat unfavorably' : 1,
+#     'Very unfavorably' : 0,
+#     'Unfamiliar (N/A)' : np.nan,
+#     np.nan : np.nan
+# }
