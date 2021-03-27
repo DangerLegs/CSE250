@@ -11,6 +11,13 @@ from sklearn.model_selection import train_test_split
 from sklearn import tree
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
+# %%
+from sklearn.model_selection import train_test_split
+from sklearn import tree
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn import metrics
+from sklearn.ensemble import RandomForestClassifier
 
 
 # %%
@@ -80,7 +87,8 @@ dat.columns = dat_names.column_names.to_list()
 
 seen_map = {'Yes': 1, 'No': 0}
 dat['seen_any'] = dat['seen_any'].map(seen_map)
-
+dat['star_wars_fans'] = dat['star_wars_fans'].map(seen_map)
+dat['star_trek_fan'] = dat['star_trek_fan'].map(seen_map)
 # %% 
 dat = dat[dat.seen_any == 1]
 
@@ -209,25 +217,49 @@ dat = dat.drop(columns = ['seen__i__the_phantom_menace', 'seen__ii__attack_of_th
 
 
 # %%
+income = (dat.household_income
+    .str.split(' - ', expand = True)
+    .rename(columns= {0: 'min_income', 1:'max_income}'})
+    .min_income
+    .str.replace('\$|,|\+', '', regex=True)
+    .astype('float')
+)
 
-# pd.get_dummies(dat_seen)
-# dat_seen.fillna(value = "NO")
-# print(pd.factorize(dat.view__han_solo)[0])
-# # %%
-# variables_replace = {
-#     'Neither favorably nor unfavorably (neutral)':0,
-#     'Very favorably':3,
-#     'Somewhat favorably': 2
-# }
-# dat_view.replace(variables_replace)
+# %%
+dat['household_income'] = income
+
+# %%
+#drop na
+
+mydata = dat.dropna()
 
 
-# view_replace = {
-#     'Very favorably' : 4,
-#     'Somewhat favorably' : 3,
-#     'Neither favorably nor unfavorably (neutral)' : 2,
-#     'Somewhat unfavorably' : 1,
-#     'Very unfavorably' : 0,
-#     'Unfamiliar (N/A)' : np.nan,
-#     np.nan : np.nan
-# }
+# %%
+#machine learning model
+
+X_pred = mydata.drop(columns = ['household_income'])
+y_pred = mydata.filter(['household_income'])
+X_train, X_test, y_train, y_test = train_test_split(
+    X_pred, 
+    y_pred, 
+    test_size = .34, 
+    random_state = 76) 
+
+# %%
+clf = RandomForestClassifier()
+clf_1= clf.fit(X_train, y_train)
+# %%
+predictions = clf.predict(X_test)
+
+# %%
+score = clf.score(X_test, y_test)
+print(score)
+metrics.accuracy_score(y_test, predictions)
+# %%
+metrics.recall_score(y_test, predictions)
+# %%
+metrics.precision_score(y_test, predictions)
+# %%
+print(metrics.classification_report(y_test, predictions))
+# %%
+metrics.plot_roc_curve(clf, X_test, y_test)
